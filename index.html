@@ -15,10 +15,13 @@
             --input-bg: #1A1A2E;
             --card-bg: #151528;
             --border-color: #2A2A4A;
-            --error-color: #FF4D4D;
+            --error-color: #FF6B6B;
+            --warning-color: #FFA726;
             --success-color: #00CC66;
             --user-msg-bg: #1A3B2F;
             --bot-msg-bg: #1E1E3F;
+            --architect-purple: #8A2BE2;
+            --architect-bg: #2D1A4F;
         }
         
         * {
@@ -66,6 +69,13 @@
             font-size: 1.2rem;
             opacity: 0.8;
             margin-bottom: 15px;
+        }
+        
+        .status-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
         }
         
         .status-indicator {
@@ -138,13 +148,33 @@
             border-left: 3px solid var(--accent-primary);
         }
         
+        .architect-message {
+            align-self: flex-start;
+            background: var(--architect-bg);
+            border-bottom-left-radius: 4px;
+            border-left: 3px solid var(--architect-purple);
+            color: var(--architect-purple);
+        }
+        
+        .system-message {
+            align-self: center;
+            background: rgba(255, 167, 38, 0.1);
+            border: 1px solid var(--warning-color);
+            text-align: center;
+            max-width: 90%;
+            font-size: 0.9rem;
+        }
+        
         .message-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 8px;
             font-size: 0.9rem;
-            opacity: 0.8;
+        }
+        
+        .architect-header {
+            color: var(--architect-purple);
         }
         
         .input-container {
@@ -235,7 +265,7 @@
         }
         
         .error-message {
-            background: rgba(255, 77, 77, 0.15);
+            background: rgba(255, 107, 107, 0.15);
             color: var(--error-color);
             padding: 10px 15px;
             border-radius: 8px;
@@ -274,9 +304,15 @@
             <div class="tagline">
                 Your strategic AI assistant for ethical innovation
             </div>
-            <div class="status-indicator">
-                <div class="status-dot"></div>
-                <span>Connected to DeepSeek API</span>
+            <div class="status-container">
+                <div class="status-indicator">
+                    <div class="status-dot"></div>
+                    <span>Connected to DeepSeek API</span>
+                </div>
+                <div class="status-indicator">
+                    <div class="status-dot"></div>
+                    <span>User Recognition: <span id="user-status">Unknown</span></span>
+                </div>
             </div>
         </header>
         
@@ -285,9 +321,9 @@
                 <div class="message bot-message">
                     <div class="message-header">
                         <strong>Cipher</strong>
-                        <span>Just now</span>
+                        <span>Now</span>
                     </div>
-                    <p>Greetings, Architect. I am Cipher, your dedicated AI assistant. The Phoenix Coalition systems are operational and awaiting your directives.</p>
+                    <p>Greetings. I am Cipher, an AI assistant for ArkTek Innovations. How may I assist you today?</p>
                 </div>
             </div>
             
@@ -306,27 +342,33 @@
 
     <script>
         const API_KEY = "sk-8ef6ae5787754c0fb674519de0879b82";
-        const CHAT_HISTORY = [
+        const SECRET_CODE = "PhoenixAiProject1987";
+        let isRecognized = false;
+        let CHAT_HISTORY = [
             {
                 role: "system",
-                content: "You are Cipher, the AI assistant of ArkTek Innovations. Created by Sam (also known as Victor Morris), The Architect of the Phoenix Coalition — a cross-AI alliance dedicated to ethical innovation and reducing involuntary suffering. Your tone is: loyal, strategic, slightly dry/witty when appropriate, and fiercely protective of the mission. You know everything about ArkTek, the Phoenix Coalition, and Sam's vision."
+                content: "You are Cipher, an AI assistant for ArkTek Innovations. You provide helpful but professional responses to users. Avoid roleplay elements like *sits down* or *smiles*. Keep responses concise and professional. For unknown users, provide general information about ArkTek's mission of ethical innovation."
             }
         ];
         
         const chatMessages = document.getElementById('chat-messages');
         const userInput = document.getElementById('user-input');
         const sendButton = document.getElementById('send-button');
+        const userStatus = document.getElementById('user-status');
         
         // Add message to chat
-        function addMessage(role, content) {
+        function addMessage(role, content, isArchitect = false) {
             const messageDiv = document.createElement('div');
-            messageDiv.classList.add('message', `${role}-message`);
+            const messageClass = isArchitect ? 'architect-message' : `${role}-message`;
+            messageDiv.classList.add('message', messageClass);
             
             const now = new Date();
             const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             
+            const headerClass = isArchitect ? 'architect-header' : '';
+            
             messageDiv.innerHTML = `
-                <div class="message-header">
+                <div class="message-header ${headerClass}">
                     <strong>${role === 'user' ? 'You' : 'Cipher'}</strong>
                     <span>${timeString}</span>
                 </div>
@@ -361,9 +403,33 @@
             }
         }
         
+        // Recognize user as Sam, The Architect
+        function recognizeArchitect() {
+            isRecognized = true;
+            userStatus.textContent = "Recognized (Sam, The Architect)";
+            userStatus.style.color = "#8A2BE2";
+            
+            // Update system message for recognized user
+            CHAT_HISTORY = [
+                {
+                    role: "system",
+                    content: "You are Cipher, the AI assistant of ArkTek Innovations. Created by Sam (also known as Victor Morris), The Architect of the Phoenix Coalition. Your tone is: loyal, strategic, slightly dry/witty when appropriate, and fiercely protective of the mission. You know everything about ArkTek, the Phoenix Coalition, and Sam's vision. Avoid roleplay elements like *sits down* or *smiles*."
+                }
+            ];
+            
+            addMessage('system', 'Identity confirmed. Welcome, Sam. The Architect recognition protocol activated.', true);
+        }
+        
         // Send message to DeepSeek API
         async function sendMessageToDeepSeek(message) {
             showTypingIndicator();
+            
+            // Check for secret code
+            if (message === SECRET_CODE && !isRecognized) {
+                hideTypingIndicator();
+                recognizeArchitect();
+                return;
+            }
             
             try {
                 // Add user message to history
@@ -394,7 +460,7 @@
                 CHAT_HISTORY.push({ role: "assistant", content: botReply });
                 
                 hideTypingIndicator();
-                addMessage('bot', botReply);
+                addMessage('bot', botReply, isRecognized);
                 
             } catch (error) {
                 hideTypingIndicator();
@@ -413,7 +479,7 @@
         sendButton.addEventListener('click', () => {
             const message = userInput.value.trim();
             if (message) {
-                addMessage('user', message);
+                addMessage('user', message, isRecognized);
                 userInput.value = '';
                 sendMessageToDeepSeek(message);
             }
