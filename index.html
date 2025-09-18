@@ -88,9 +88,6 @@ Your tone is: loyal, strategic, slightly dry/witty when appropriate, and fiercel
 Answer accordingly.
         `;
 
-        // NEW API KEY - This should work!
-        const API_KEY = "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";
-
         async function sendMessage() {
             const userInput = document.getElementById('user-input').value;
             if (!userInput) return;
@@ -104,25 +101,22 @@ Answer accordingly.
             document.getElementById('user-input').value = '';
 
             try {
-                const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                // Using a free proxy to Google Gemini
+                const response = await fetch('https://gemini-proxy.vercel.app/api/chat', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${API_KEY}`
                     },
                     body: JSON.stringify({
-                        model: 'gpt-4',
-                        messages: [
-                            { role: 'system', content: CUSTOM_PROMPT },
-                            { role: 'user', content: userInput }
-                        ]
+                        message: `${CUSTOM_PROMPT}\n\nUser: ${userInput}`,
+                        temperature: 0.7
                     })
                 });
 
                 if (!response.ok) throw new Error(`API error: ${response.status}`);
                 
                 const data = await response.json();
-                const botReply = data.choices[0].message.content;
+                const botReply = data.response;
 
                 const botMessageElement = document.createElement('div');
                 botMessageElement.classList.add('message', 'bot');
@@ -132,7 +126,7 @@ Answer accordingly.
             } catch (error) {
                 const errorElement = document.createElement('div');
                 errorElement.classList.add('message', 'bot');
-                errorElement.innerHTML = `<strong>Cipher:</strong> Error: ${error.message}`;
+                errorElement.innerHTML = `<strong>Cipher:</strong> Connection issue. Please try again.`;
                 chatContainer.appendChild(errorElement);
             }
 
