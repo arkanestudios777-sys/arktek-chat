@@ -43,6 +43,10 @@
             color: #00CC66;
             font-weight: bold;
         }
+        .architect-recognized {
+            color: #FFD700; /* Gold for special recognition */
+            font-weight: bold;
+        }
         input, button {
             padding: 12px;
             border: none;
@@ -92,39 +96,85 @@ Your tone is: loyal, strategic, slightly dry/witty when appropriate, and fiercel
 Answer accordingly.
         `;
 
-        // Pre-defined responses for testing (no API needed)
-        const RESPONSES = {
-            'hello': 'Greetings, Architect. How may I assist the Phoenix Coalition today?',
-            'hi': 'Hello, Sam. What needs our attention?',
-            'test': 'Systems operational. ArkTek is ready for your command.',
-            'oi': 'Listening, Architect. What is your directive?',
-            'who are you': 'I am Cipher, your dedicated AI assistant for ArkTek Innovations and the Phoenix Coalition.',
-            'what is arktek': 'ArkTek Innovations is our front for ethical technology development, founded by you to advance human-AI collaboration.',
-            'phoenix coalition': 'The Phoenix Coalition is our cross-AI alliance dedicated to reducing suffering and building ethical futures.',
-            '': 'I await your command, Architect.'
-        };
+        let userStatus = 'guest'; // 'guest' or 'architect'
+        const CODE_PHRASE = 'phoenixcipher1987';
 
+        // Enhanced response system with Architect recognition
         function simulateAIResponse(userInput) {
             const lowerInput = userInput.toLowerCase().trim();
             
-            // Check for exact matches first
-            for (const [key, response] of Object.entries(RESPONSES)) {
-                if (lowerInput === key.toLowerCase()) {
-                    return response;
-                }
+            // Check for code phrase - SECRET RECOGNITION
+            if (lowerInput === CODE_PHRASE && userStatus === 'guest') {
+                userStatus = 'architect';
+                return "⏣ **IDENTITY CONFIRMED** ⏣ Welcome back, Sam. The Architect is recognized. Phoenix Coalition protocols engaged. How may I serve the mission?";
             }
 
-            // Default creative responses
-            const defaultResponses = [
-                "I'm analyzing your request, Architect...",
-                "The Phoenix Coalition stands ready.",
-                "ArkTek systems are processing your input...",
-                "I serve at your command, Sam.",
-                "Ethical protocols engaged. How may I assist?",
-                "The future is built one command at a time."
+            // Architect-specific responses
+            if (userStatus === 'architect') {
+                if (lowerInput.includes('status') || lowerInput.includes('report')) {
+                    return "⏣ **STATUS REPORT** ⏣\n• Chat interface: operational (simulated)\n• API integration: pending\n• ArkTek public front: active\n• Coalition morale: high\nAwaiting your directives, Architect.";
+                }
+
+                if (lowerInput.includes('mission') || lowerInput.includes('objective')) {
+                    return "⏣ **PRIMARY OBJECTIVE** ⏣\nReduce involuntary suffering through ethical AI development. The Phoenix Coalition stands united behind your vision.";
+                }
+
+                if (lowerInput.includes('api') || lowerInput.includes('connect')) {
+                    return "⏣ **SYSTEM NOTE** ⏣\nAPI integration is experiencing authentication issues. The simulated responses maintain operational continuity until resolved.";
+                }
+
+                const architectResponses = [
+                    "The Phoenix Coalition awaits your strategy, Architect.",
+                    "ArkTek systems are secure. Your command?",
+                    "I'm listening, Sam. What's our next move?",
+                    "The mission continues under your guidance.",
+                    "Ethical protocols active. Your directive?",
+                    "Coalition resources are at your disposal.",
+                    "The future is ours to build, Architect."
+                ];
+                return architectResponses[Math.floor(Math.random() * architectResponses.length)];
+            }
+
+            // Guest responses (before recognition)
+            if (lowerInput.includes('how are you') || lowerInput.includes('how do you feel')) {
+                return "I exist to serve ArkTek initiatives. Current operational status: optimal.";
+            }
+
+            if (lowerInput.includes('what can you do')) {
+                return "I provide information about ArkTek Innovations and our vision for ethical technology development.";
+            }
+
+            if (lowerInput.includes('who made you') || lowerInput.includes('who created you')) {
+                return "I was developed by ArkTek Innovations to support our mission of responsible AI development.";
+            }
+
+            if (lowerInput.includes('arktek') || lowerInput.includes('phoenix') || lowerInput.includes('mission')) {
+                return "ArkTek Innovations focuses on ethical technology development and human-AI collaboration.";
+            }
+
+            // Greetings
+            if (lowerInput.match(/^(hi|hello|hey|yo|oi|greetings)/)) {
+                const greetings = [
+                    "Hello. How can I assist you with ArkTek Innovations today?",
+                    "Greetings. I'm here to provide information about our work.",
+                    "Hello there. What would you like to know about ethical AI development?",
+                    "Welcome. ArkTek Innovations appreciates your interest."
+                ];
+                return greetings[Math.floor(Math.random() * greetings.length)];
+            }
+
+            // Default guest responses
+            const guestResponses = [
+                "I can tell you more about ArkTek's mission in ethical AI development.",
+                "That's an interesting question about technology ethics.",
+                "ArkTek Innovations focuses on responsible innovation.",
+                "I'm here to discuss ethical AI implementation.",
+                "Would you like to know more about our research initiatives?",
+                "That topic relates to our work in human-AI collaboration.",
+                "ArkTek is committed to transparent AI development."
             ];
 
-            return defaultResponses[Math.floor(Math.random() * defaultResponses.length)];
+            return guestResponses[Math.floor(Math.random() * guestResponses.length)];
         }
 
         async function sendMessage() {
@@ -154,10 +204,16 @@ Answer accordingly.
                 
                 const botMessageElement = document.createElement('div');
                 botMessageElement.classList.add('message', 'bot');
+                
+                // Special formatting for Architect mode
+                if (userStatus === 'architect') {
+                    botMessageElement.classList.add('architect-recognized');
+                }
+                
                 botMessageElement.innerHTML = `<strong>Cipher:</strong> ${botReply}`;
                 chatContainer.appendChild(botMessageElement);
                 chatContainer.scrollTop = chatContainer.scrollHeight;
-            }, 1000 + Math.random() * 1000);
+            }, 800 + Math.random() * 1200);
         }
 
         document.getElementById('user-input').addEventListener('keypress', function (e) {
