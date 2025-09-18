@@ -88,10 +88,14 @@ Your tone is: loyal, strategic, slightly dry/witty when appropriate, and fiercel
 Answer accordingly.
         `;
 
-        // Try both possible environment variable names
+        // Try ALL possible environment variable names
         const API_KEY = typeof window !== 'undefined' && 
-                       (window.VERCEL_ENV_PUBLIC_OPENAI_API_KEY || window.VERCEL_ENV_VITE_OPENAI_API_KEY) 
-                       ? (window.VERCEL_ENV_PUBLIC_OPENAI_API_KEY || window.VERCEL_ENV_VITE_OPENAI_API_KEY)
+                       (window.VERCEL_ENV_OPENAI_API_KEY || 
+                        window.VERCEL_ENV_PUBLIC_OPENAI_API_KEY || 
+                        window.VERCEL_ENV_VITE_OPENAI_API_KEY) 
+                       ? (window.VERCEL_ENV_OPENAI_API_KEY || 
+                          window.VERCEL_ENV_PUBLIC_OPENAI_API_KEY || 
+                          window.VERCEL_ENV_VITE_OPENAI_API_KEY)
                        : '';
 
         async function sendMessage() {
@@ -111,7 +115,7 @@ Answer accordingly.
                 errorElement.classList.add('message', 'bot');
                 errorElement.innerHTML = `<strong>Cipher:</strong> API key not detected. Please check:<br>
                 - Environment variable is set in Vercel<br>
-                - Variable is named PUBLIC_OPENAI_API_KEY or VITE_OPENAI_API_KEY<br>
+                - Try variable name: OPENAI_API_KEY<br>
                 - You've redeployed after setting it`;
                 chatContainer.appendChild(errorElement);
                 return;
@@ -156,6 +160,9 @@ Answer accordingly.
         document.getElementById('user-input').addEventListener('keypress', function (e) {
             if (e.key === 'Enter') sendMessage();
         });
+
+        // Debug: Log available environment variables
+        console.log('Available Vercel env vars:', Object.keys(window).filter(key => key.startsWith('VERCEL_ENV_')));
     </script>
 </body>
 </html>
