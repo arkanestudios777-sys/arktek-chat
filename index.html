@@ -88,8 +88,10 @@ Your tone is: loyal, strategic, slightly dry/witty when appropriate, and fiercel
 Answer accordingly.
         `;
 
-        // API key is set through environment variable (secure)
-        const API_KEY = "VITE_OPENAI_API_KEY" in window ? window.VITE_OPENAI_API_KEY : "";
+        // Vercel injects environment variables with prefix VERCEL_ENV_
+        const API_KEY = typeof window !== 'undefined' && window.VERCEL_ENV_VITE_OPENAI_API_KEY 
+            ? window.VERCEL_ENV_VITE_OPENAI_API_KEY 
+            : '';
 
         async function sendMessage() {
             const userInput = document.getElementById('user-input').value;
@@ -106,7 +108,10 @@ Answer accordingly.
             if (!API_KEY) {
                 const errorElement = document.createElement('div');
                 errorElement.classList.add('message', 'bot');
-                errorElement.innerHTML = `<strong>Cipher:</strong> API key not configured. Please add your OpenAI API key in Vercel environment variables.`;
+                errorElement.innerHTML = `<strong>Cipher:</strong> API key not detected. Make sure you've:<br>
+                1. Added VITE_OPENAI_API_KEY in Vercel Environment Variables<br>
+                2. Redeployed after adding the key<br>
+                3. The key value starts with 'sk-proj-'`;
                 chatContainer.appendChild(errorElement);
                 return;
             }
@@ -127,6 +132,10 @@ Answer accordingly.
                     })
                 });
 
+                if (!response.ok) {
+                    throw new Error(`API error: ${response.status}`);
+                }
+
                 const data = await response.json();
                 const botReply = data.choices[0].message.content;
 
@@ -136,10 +145,10 @@ Answer accordingly.
                 chatContainer.appendChild(botMessageElement);
 
             } catch (error) {
-                console.error("Error calling OpenAI API:", error);
+                console.error("Error:", error);
                 const errorElement = document.createElement('div');
                 errorElement.classList.add('message', 'bot');
-                errorElement.innerHTML = `<strong>Cipher:</strong> I'm experiencing technical difficulties. Please try again later.`;
+                errorElement.innerHTML = `<strong>Cipher:</strong> Error: ${error.message}. Check your API key and try again.`;
                 chatContainer.appendChild(errorElement);
             }
 
