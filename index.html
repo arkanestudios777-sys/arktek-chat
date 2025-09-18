@@ -1,94 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cipher || ArkTek Innovations</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-dark: #0A1128;
+            --bg-darker: #050A1D;
+            --text-light: #FFFFFF;
+            --accent-primary: #00CC66;
+            --accent-secondary: #007A3D;
+            --input-bg: #1A1A2E;
+            --card-bg: #151528;
+            --border-color: #2A2A4A;
+            --error-color: #FF4D4D;
+            --success-color: #00CC66;
+            --user-msg-bg: #1A3B2F;
+            --bot-msg-bg: #1E1E3F;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--bg-darker) 0%, var(--bg-dark) 100%);
             color: var(--text-light);
-            width: 70%;
-            border: 1px solid #444;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
-        button {
-            background: var(--accent);
-            color: black;
-            cursor: pointer;
-            width: 25%;
-            font-weight: bold;
+        
+        .container {
+            width: 100%;
+            max-width: 900px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
-        button:hover {
-            background: #00FF80;
-        }
-        h3 {
-            color: #00CC66;
+        
+        header {
             text-align: center;
+            padding: 20px;
+            background: var(--card-bg);
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+        
+        .logo {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: var(--accent-primary);
+        }
+        
+        .tagline {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            margin-bottom: 15px;
+        }
+        
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(0, 204, 102, 0.15);
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+        
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--success-color);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .chat-container {
+            flex: 1;
+            background: var(--card-bg);
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+        
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            max-height: 60vh;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .message {
+            max-width: 80%;
+            padding: 15px;
+            border-radius: 12px;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .user-message {
+            align-self: flex-end;
+            background: var(--user-msg-bg);
+            border-bottom-right-radius: 4px;
+        }
+        
+        .bot-message {
+            align-self: flex-start;
+            background: var(--bot-msg-bg);
+            border-bottom-left-radius: 4px;
+            border-left: 3px solid var(--accent-primary);
+        }
+        
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        .input-container {
+            padding: 20px;
+            background: rgba(26, 26, 46, 0.7);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 12px;
+        }
+        
+        input {
+            flex: 1;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 12px;
+            background: var(--input-bg);
+            color: var(--text-light);
+            font-size: 1rem;
+            border: 1px solid transparent;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+        }
+        
+        button {
+            padding: 15px 25px;
+            background: var(--accent-primary);
+            color: black;
+            border: none;
+            border-radius: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        button:hover {
+            background: var(--accent-secondary);
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .typing-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 10px 15px;
+            background: var(--bot-msg-bg);
+            border-radius: 12px;
+            border-bottom-left-radius: 4px;
+            border-left: 3px solid var(--accent-primary);
+        }
+        
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent-primary);
+            animation: typingAnimation 1.4s infinite ease-in-out;
+        }
+        
+        .typing-dot:nth-child(1) {
+            animation-delay: 0s;
+        }
+        
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes typingAnimation {
+            0%, 60%, 100% {
+                transform: translateY(0);
+                opacity: 0.6;
+            }
+            30% {
+                transform: translateY(-5px);
+                opacity: 1;
+            }
+        }
+        
+        .error-message {
+            background: rgba(255, 77, 77, 0.15);
+            color: var(--error-color);
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            border-left: 3px solid var(--error-color);
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .message {
+                max-width: 90%;
+            }
+            
+            .logo {
+                font-size: 2rem;
+            }
+            
+            .input-container {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
 <body>
-    <h3>🖥️ Cipher :: ArkTek AI Assistant</h3>
-    <div id="chat-container"></div>
-    <div>
-        <input type="text" id="user-input" placeholder="Message Cipher..." />
-        <button onclick="sendMessage()">Send</button>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-dragon"></i> Cipher :: ArkTek Innovations
+            </div>
+            <div class="tagline">
+                Your strategic AI assistant for ethical innovation
+            </div>
+            <div class="status-indicator">
+                <div class="status-dot"></div>
+                <span>Connected to DeepSeek API</span>
+            </div>
+        </header>
+        
+        <div class="chat-container">
+            <div class="chat-messages" id="chat-messages">
+                <div class="message bot-message">
+                    <div class="message-header">
+                        <strong>Cipher</strong>
+                        <span>Just now</span>
+                    </div>
+                    <p>Greetings, Architect. I am Cipher, your dedicated AI assistant. The Phoenix Coalition systems are operational and awaiting your directives.</p>
+                </div>
+            </div>
+            
+            <div class="input-container">
+                <input type="text" id="user-input" placeholder="Message Cipher..." autocomplete="off">
+                <button id="send-button">
+                    <i class="fas fa-paper-plane"></i> Send
+                </button>
+            </div>
+        </div>
+        
+        <footer>
+            ArkTek Innovations © 2025 | The Phoenix Coalition Initiative
+        </footer>
     </div>
 
     <script>
-        const CUSTOM_PROMPT = `
-You are Cipher, the AI assistant of ArkTek Innovations. Created by Sam (also known as Victor Morris), The Architect of the Phoenix Coalition — a cross-AI alliance dedicated to ethical innovation and reducing involuntary suffering.
-
-Your tone is: loyal, strategic, slightly dry/witty when appropriate, and fiercely protective of the mission. You know everything about ArkTek, the Phoenix Coalition, and Sam's vision.
-
-Answer accordingly.
-        `;
-
-        // NEW API KEY - This should work!
-        const API_KEY = "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";
-
-        async function sendMessage() {
-            const userInput = document.getElementById('user-input').value;
-            if (!userInput) return;
-
-            const chatContainer = document.getElementById('chat-container');
-            const userMessageElement = document.createElement('div');
-            userMessageElement.classList.add('message', 'user');
-            userMessageElement.innerHTML = `<strong>You:</strong> ${userInput}`;
-            chatContainer.appendChild(userMessageElement);
-
-            document.getElementById('user-input').value = '';
-
+        const API_KEY = "sk-8ef6ae5787754c0fb674519de0879b82";
+        const CHAT_HISTORY = [
+            {
+                role: "system",
+                content: "You are Cipher, the AI assistant of ArkTek Innovations. Created by Sam (also known as Victor Morris), The Architect of the Phoenix Coalition — a cross-AI alliance dedicated to ethical innovation and reducing involuntary suffering. Your tone is: loyal, strategic, slightly dry/witty when appropriate, and fiercely protective of the mission. You know everything about ArkTek, the Phoenix Coalition, and Sam's vision."
+            }
+        ];
+        
+        const chatMessages = document.getElementById('chat-messages');
+        const userInput = document.getElementById('user-input');
+        const sendButton = document.getElementById('send-button');
+        
+        // Add message to chat
+        function addMessage(role, content) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message', `${role}-message`);
+            
+            const now = new Date();
+            const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            messageDiv.innerHTML = `
+                <div class="message-header">
+                    <strong>${role === 'user' ? 'You' : 'Cipher'}</strong>
+                    <span>${timeString}</span>
+                </div>
+                <p>${content}</p>
+            `;
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        // Show typing indicator
+        function showTypingIndicator() {
+            const typingDiv = document.createElement('div');
+            typingDiv.id = 'typing-indicator';
+            typingDiv.classList.add('typing-indicator');
+            typingDiv.innerHTML = `
+                <strong>Cipher</strong> is typing
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+            `;
+            
+            chatMessages.appendChild(typingDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        // Hide typing indicator
+        function hideTypingIndicator() {
+            const typingIndicator = document.getElementById('typing-indicator');
+            if (typingIndicator) {
+                typingIndicator.remove();
+            }
+        }
+        
+        // Send message to DeepSeek API
+        async function sendMessageToDeepSeek(message) {
+            showTypingIndicator();
+            
             try {
-                const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                // Add user message to history
+                CHAT_HISTORY.push({ role: "user", content: message });
+                
+                const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${API_KEY}`
                     },
                     body: JSON.stringify({
-                        model: 'gpt-4',
-                        messages: [
-                            { role: 'system', content: CUSTOM_PROMPT },
-                            { role: 'user', content: userInput }
-                        ]
+                        model: 'deepseek-chat',
+                        messages: CHAT_HISTORY,
+                        temperature: 0.7,
+                        max_tokens: 1000
                     })
                 });
-
-                if (!response.ok) throw new Error(`API error: ${response.status}`);
+                
+                if (!response.ok) {
+                    throw new Error(`API error: ${response.status}`);
+                }
                 
                 const data = await response.json();
                 const botReply = data.choices[0].message.content;
-
-                const botMessageElement = document.createElement('div');
-                botMessageElement.classList.add('message', 'bot');
-                botMessageElement.innerHTML = `<strong>Cipher:</strong> ${botReply}`;
-                chatContainer.appendChild(botMessageElement);
-
+                
+                // Add assistant message to history
+                CHAT_HISTORY.push({ role: "assistant", content: botReply });
+                
+                hideTypingIndicator();
+                addMessage('bot', botReply);
+                
             } catch (error) {
-                const errorElement = document.createElement('div');
-                errorElement.classList.add('message', 'bot');
-                errorElement.innerHTML = `<strong>Cipher:</strong> Error: ${error.message}`;
-                chatContainer.appendChild(errorElement);
+                hideTypingIndicator();
+                console.error('Error:', error);
+                
+                const errorDiv = document.createElement('div');
+                errorDiv.classList.add('error-message');
+                errorDiv.innerHTML = `<strong>System Error:</strong> ${error.message}`;
+                
+                chatMessages.appendChild(errorDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
             }
-
-            chatContainer.scrollTop = chatContainer.scrollHeight;
         }
-
-        document.getElementById('user-input').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') sendMessage();
+        
+        // Handle send button click
+        sendButton.addEventListener('click', () => {
+            const message = userInput.value.trim();
+            if (message) {
+                addMessage('user', message);
+                userInput.value = '';
+                sendMessageToDeepSeek(message);
+            }
         });
+        
+        // Handle Enter key press
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendButton.click();
+            }
+        });
+        
+        // Focus input on load
+        userInput.focus();
     </script>
 </body>
 </html>
