@@ -6,10 +6,10 @@
     <title>Cipher || ArkTek Innovations</title>
     <style>
         :root {
-            --bg-dark: #000000; /* BLACK background */
-            --text-light: #FFFFFF; /* White text */
-            --accent: #00CC66; /* Green for Cipher */
-            --input-bg: #1A1A1A; /* Dark gray for input */
+            --bg-dark: #000000;
+            --text-light: #FFFFFF;
+            --accent: #00CC66;
+            --input-bg: #1A1A1A;
         }
         body {
             background: var(--bg-dark);
@@ -36,11 +36,11 @@
             line-height: 1.5;
         }
         .user {
-            color: #FFFFFF; /* WHITE for user */
+            color: #FFFFFF;
             font-weight: bold;
         }
         .bot {
-            color: #00CC66; /* GREEN for Cipher */
+            color: #00CC66;
             font-weight: bold;
         }
         input, button {
@@ -57,7 +57,7 @@
         }
         button {
             background: var(--accent);
-            color: black; /* Black text on green button */
+            color: black;
             cursor: pointer;
             width: 25%;
             font-weight: bold;
@@ -66,7 +66,7 @@
             background: #00FF80;
         }
         h3 {
-            color: #00CC66; /* Green title to match Cipher */
+            color: #00CC66;
             text-align: center;
         }
     </style>
@@ -88,15 +88,8 @@ Your tone is: loyal, strategic, slightly dry/witty when appropriate, and fiercel
 Answer accordingly.
         `;
 
-        // Try ALL possible environment variable names
-        const API_KEY = typeof window !== 'undefined' && 
-                       (window.VERCEL_ENV_OPENAI_API_KEY || 
-                        window.VERCEL_ENV_PUBLIC_OPENAI_API_KEY || 
-                        window.VERCEL_ENV_VITE_OPENAI_API_KEY) 
-                       ? (window.VERCEL_ENV_OPENAI_API_KEY || 
-                          window.VERCEL_ENV_PUBLIC_OPENAI_API_KEY || 
-                          window.VERCEL_ENV_VITE_OPENAI_API_KEY)
-                       : '';
+        // DIRECT API KEY (For testing - remove this later for security)
+        const API_KEY = "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";
 
         async function sendMessage() {
             const userInput = document.getElementById('user-input').value;
@@ -109,17 +102,6 @@ Answer accordingly.
             chatContainer.appendChild(userMessageElement);
 
             document.getElementById('user-input').value = '';
-
-            if (!API_KEY) {
-                const errorElement = document.createElement('div');
-                errorElement.classList.add('message', 'bot');
-                errorElement.innerHTML = `<strong>Cipher:</strong> API key not detected. Please check:<br>
-                - Environment variable is set in Vercel<br>
-                - Try variable name: OPENAI_API_KEY<br>
-                - You've redeployed after setting it`;
-                chatContainer.appendChild(errorElement);
-                return;
-            }
 
             try {
                 const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -160,9 +142,6 @@ Answer accordingly.
         document.getElementById('user-input').addEventListener('keypress', function (e) {
             if (e.key === 'Enter') sendMessage();
         });
-
-        // Debug: Log available environment variables
-        console.log('Available Vercel env vars:', Object.keys(window).filter(key => key.startsWith('VERCEL_ENV_')));
     </script>
 </body>
 </html>
