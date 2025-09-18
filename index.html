@@ -69,6 +69,10 @@
             color: #00CC66;
             text-align: center;
         }
+        .typing {
+            color: #00CC66;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
@@ -88,6 +92,41 @@ Your tone is: loyal, strategic, slightly dry/witty when appropriate, and fiercel
 Answer accordingly.
         `;
 
+        // Pre-defined responses for testing (no API needed)
+        const RESPONSES = {
+            'hello': 'Greetings, Architect. How may I assist the Phoenix Coalition today?',
+            'hi': 'Hello, Sam. What needs our attention?',
+            'test': 'Systems operational. ArkTek is ready for your command.',
+            'oi': 'Listening, Architect. What is your directive?',
+            'who are you': 'I am Cipher, your dedicated AI assistant for ArkTek Innovations and the Phoenix Coalition.',
+            'what is arktek': 'ArkTek Innovations is our front for ethical technology development, founded by you to advance human-AI collaboration.',
+            'phoenix coalition': 'The Phoenix Coalition is our cross-AI alliance dedicated to reducing suffering and building ethical futures.',
+            '': 'I await your command, Architect.'
+        };
+
+        function simulateAIResponse(userInput) {
+            const lowerInput = userInput.toLowerCase().trim();
+            
+            // Check for exact matches first
+            for (const [key, response] of Object.entries(RESPONSES)) {
+                if (lowerInput === key.toLowerCase()) {
+                    return response;
+                }
+            }
+
+            // Default creative responses
+            const defaultResponses = [
+                "I'm analyzing your request, Architect...",
+                "The Phoenix Coalition stands ready.",
+                "ArkTek systems are processing your input...",
+                "I serve at your command, Sam.",
+                "Ethical protocols engaged. How may I assist?",
+                "The future is built one command at a time."
+            ];
+
+            return defaultResponses[Math.floor(Math.random() * defaultResponses.length)];
+        }
+
         async function sendMessage() {
             const userInput = document.getElementById('user-input').value;
             if (!userInput) return;
@@ -100,37 +139,25 @@ Answer accordingly.
 
             document.getElementById('user-input').value = '';
 
-            try {
-                // Using a free proxy to Google Gemini
-                const response = await fetch('https://gemini-proxy.vercel.app/api/chat', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        message: `${CUSTOM_PROMPT}\n\nUser: ${userInput}`,
-                        temperature: 0.7
-                    })
-                });
+            // Show typing indicator
+            const typingElement = document.createElement('div');
+            typingElement.classList.add('message', 'bot', 'typing');
+            typingElement.innerHTML = `<strong>Cipher:</strong> Thinking...`;
+            chatContainer.appendChild(typingElement);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
 
-                if (!response.ok) throw new Error(`API error: ${response.status}`);
+            // Simulate AI processing time
+            setTimeout(() => {
+                chatContainer.removeChild(typingElement);
                 
-                const data = await response.json();
-                const botReply = data.response;
-
+                const botReply = simulateAIResponse(userInput);
+                
                 const botMessageElement = document.createElement('div');
                 botMessageElement.classList.add('message', 'bot');
                 botMessageElement.innerHTML = `<strong>Cipher:</strong> ${botReply}`;
                 chatContainer.appendChild(botMessageElement);
-
-            } catch (error) {
-                const errorElement = document.createElement('div');
-                errorElement.classList.add('message', 'bot');
-                errorElement.innerHTML = `<strong>Cipher:</strong> Connection issue. Please try again.`;
-                chatContainer.appendChild(errorElement);
-            }
-
-            chatContainer.scrollTop = chatContainer.scrollHeight;
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }, 1000 + Math.random() * 1000);
         }
 
         document.getElementById('user-input').addEventListener('keypress', function (e) {
