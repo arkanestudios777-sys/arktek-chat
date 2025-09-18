@@ -6,10 +6,10 @@
     <title>Cipher || ArkTek Innovations</title>
     <style>
         :root {
-            --bg-dark: #0A1128;
-            --text-light: #C0C0C0;
-            --accent: #B8001F;
-            --input-bg: #1C2333;
+            --bg-dark: #000000; /* BLACK background */
+            --text-light: #FFFFFF; /* White text */
+            --accent: #00CC66; /* Green for Cipher */
+            --input-bg: #1A1A1A; /* Dark gray for input */
         }
         body {
             background: var(--bg-dark);
@@ -25,35 +25,49 @@
             flex: 1;
             overflow-y: auto;
             border: 1px solid #333;
-            padding: 10px;
+            padding: 15px;
             border-radius: 10px;
-            margin-bottom: 10px;
-            background: var(--input-bg);
+            margin-bottom: 15px;
+            background: var(--bg-dark);
+            font-size: 16px;
         }
         .message {
-            margin: 10px 0;
+            margin: 12px 0;
+            line-height: 1.5;
         }
         .user {
-            color: var(--accent);
+            color: #FFFFFF; /* WHITE for user */
+            font-weight: bold;
         }
         .bot {
-            color: var(--text-light);
+            color: #00CC66; /* GREEN for Cipher */
+            font-weight: bold;
         }
         input, button {
-            padding: 10px;
+            padding: 12px;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
+            font-size: 16px;
         }
         input {
             background: var(--input-bg);
             color: var(--text-light);
             width: 70%;
+            border: 1px solid #444;
         }
         button {
             background: var(--accent);
-            color: white;
+            color: black; /* Black text on green button */
             cursor: pointer;
             width: 25%;
+            font-weight: bold;
+        }
+        button:hover {
+            background: #00FF80;
+        }
+        h3 {
+            color: #00CC66; /* Green title to match Cipher */
+            text-align: center;
         }
     </style>
 </head>
@@ -74,8 +88,8 @@ Your tone is: loyal, strategic, slightly dry/witty when appropriate, and fiercel
 Answer accordingly.
         `;
 
-        // API key is now set through environment variable (secure)
-        const API_KEY = process.env.VITE_OPENAI_API_KEY || "";
+        // API key is set through environment variable (secure)
+        const API_KEY = "VITE_OPENAI_API_KEY" in window ? window.VITE_OPENAI_API_KEY : "";
 
         async function sendMessage() {
             const userInput = document.getElementById('user-input').value;
@@ -92,7 +106,7 @@ Answer accordingly.
             if (!API_KEY) {
                 const errorElement = document.createElement('div');
                 errorElement.classList.add('message', 'bot');
-                errorElement.innerHTML = `<strong>Cipher:</strong> API key not configured. Please contact the site administrator.`;
+                errorElement.innerHTML = `<strong>Cipher:</strong> API key not configured. Please add your OpenAI API key in Vercel environment variables.`;
                 chatContainer.appendChild(errorElement);
                 return;
             }
